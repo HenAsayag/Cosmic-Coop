@@ -10,6 +10,8 @@ test("real touch drag uses CSS finger offset and Nova multitouch never steals mo
   const page = await context.newPage();
   await page.goto("http://127.0.0.1:4317/?debug");
   await page.waitForFunction(() => window.__game?.ui);
+  await page.getByRole("button", { name: "ENTER FULL SCREEN" }).tap();
+  await expect(page.locator("#display-gate")).toBeHidden();
   await page.getByRole("button", { name: "LET’S FLY" }).tap();
   await page.getByRole("button", { name: /01 · Amethyst/ }).tap();
   await page.waitForFunction(() => window.__game?.mode === "play");

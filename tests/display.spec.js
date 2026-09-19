@@ -2,6 +2,10 @@ import { test, expect } from "@playwright/test";
 const enter = async (page) => {
   await page.goto("/?debug");
   await page.waitForFunction(() => window.__game?.ui);
+  await expect(page.locator("#display-gate")).toBeVisible();
+  await expect(page.getByRole("button", { name: "LET’S FLY" })).toBeHidden();
+  await page.getByRole("button", { name: "ENTER FULL SCREEN" }).tap();
+  await expect(page.locator("#display-gate")).toBeHidden();
   await page.getByRole("button", { name: "LET’S FLY" }).tap();
   await page.getByRole("button", { name: /01 · Amethyst/ }).tap();
 };
@@ -66,10 +70,14 @@ test("installed mode waits for landscape; unavailable fullscreen explains home-s
       configurable: true,
     });
   });
-  await enter(page);
+  await page.goto("/?debug");
+  await page.waitForFunction(() => window.__game?.ui);
   await expect(page.locator("#display-gate")).toBeVisible();
   expect(await page.evaluate(() => __game.mode)).toBe("menu");
   await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.locator("#display-gate")).toBeHidden();
+  await page.getByRole("button", { name: "LET’S FLY" }).tap();
+  await page.getByRole("button", { name: /01 · Amethyst/ }).tap();
   await page.waitForFunction(() => __game.mode === "play");
   await expect(page.locator("#display-gate")).toBeHidden();
   await context.close();
@@ -87,7 +95,8 @@ test("installed mode waits for landscape; unavailable fullscreen explains home-s
       configurable: true,
     });
   });
-  await enter(p);
+  await p.goto("/?debug");
+  await p.waitForFunction(() => window.__game?.ui);
   await expect(p.locator("#display-title")).toHaveText("ADD TO HOME SCREEN");
   expect(await p.evaluate(() => __game.mode)).toBe("menu");
   await expect(

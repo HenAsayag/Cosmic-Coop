@@ -9,7 +9,7 @@ export class UI {
     this.installHUD();
   }
   installHUD() {
-    this.root.innerHTML = `<div class="hud" id="hud"><div class="hud-top"><div><span class="label">SCORE</span><strong id="score">000000</strong><span class="combo" id="combo"></span></div><div class="wave-hud"><span class="label" id="system-label">AMETHYST EXPANSE</span><strong id="wave">01 / 80</strong></div><div><span class="lives" id="lives">♥ ♥ ♥</span><button class="pause-button" id="pause" aria-label="Pause">Ⅱ</button></div></div><div class="boss-hud" id="boss-hud"><span class="label" id="boss-name"></span><div class="heat-track"><i id="boss-health"></i></div></div><div class="hud-bottom"><div class="weapon-info"><span class="label" id="power">POWER 01 / 12</span><strong id="weapon">Pulse Blaster</strong><div class="heat-track"><i id="heat"></i></div><span class="label" id="heat-label">HEAT</span></div><div class="food-info"><span class="label">FOOD</span><strong id="food">0 / 50</strong></div><button class="nova" id="nova" aria-label="Use Nova Bomb"><b>✳</b><span id="bombs">NOVA · 3</span></button></div></div><div class="toast" id="toast"><span></span><strong></strong></div><div id="screen"></div>`;
+    this.root.innerHTML = `<div class="hud" id="hud"><div id="joystick" class="joystick" role="group" aria-label="Movement joystick"><span class="joystick-cross" aria-hidden="true">+</span><span class="joystick-knob" aria-hidden="true"></span><span class="joystick-label">MOVE</span></div><div class="hud-top"><div><span class="label">SCORE</span><strong id="score">000000</strong><span class="combo" id="combo"></span></div><div class="wave-hud"><span class="label" id="system-label">AMETHYST EXPANSE</span><strong id="wave">01 / 80</strong></div><div><span class="lives" id="lives">♥ ♥ ♥</span><button class="pause-button" id="pause" aria-label="Pause">Ⅱ</button></div></div><div class="boss-hud" id="boss-hud"><span class="label" id="boss-name"></span><div class="heat-track"><i id="boss-health"></i></div></div><div class="hud-bottom"><div class="weapon-info"><span class="label" id="power">POWER 01 / 12</span><strong id="weapon">Pulse Blaster</strong><div class="heat-track"><i id="heat"></i></div><span class="label" id="heat-label">HEAT</span></div><div class="food-info"><span class="label">FOOD</span><strong id="food">0 / 50</strong></div><button class="nova" id="nova" aria-label="Use Nova Bomb"><b>✳</b><span id="bombs">NOVA · 3</span></button></div></div><div class="toast" id="toast"><span></span><strong></strong></div><div id="screen"></div>`;
     this.el = {};
     for (const id of [
       "hud",
@@ -32,6 +32,7 @@ export class UI {
       "toast",
     ])
       this.el[id] = document.getElementById(id);
+    this.scene.inputControl.mountJoystick(document.getElementById("joystick"));
     document.getElementById("pause").onclick = () => this.scene.pauseGame();
     this.el.nova.onpointerdown = (e) => {
       e.stopPropagation();
@@ -46,7 +47,7 @@ export class UI {
     });
   }
   menu() {
-    display.release();
+    display.menu(this.scene);
     this.el.hud.style.display = "none";
     this.scene.mode = "menu";
     this.scene.showMenuArt(true);
@@ -86,7 +87,7 @@ export class UI {
     this.panel(
       "FLIGHT SCHOOL",
       "MAKE FEATHERS FLY",
-      `<p>Clear formations, collect energy cores, and bring down the boss in every tenth wave. Finish all eight systems to unlock Endless.</p><div class="controls"><div><b>MOVE</b><span>Mouse · WASD · Arrow keys<br>Touch: drag below the top quarter</span></div><div><b>FIRE</b><span>Automatic by default<br>Space or hold to fire manually</span></div><div><b>NOVA BOMB</b><span>X · Right click · ✳ button<br>50 food earns an extra bomb</span></div><div><b>STAY COOL</b><span>Heat at 100% locks fire briefly<br>Shift for precision · Esc to pause</span></div></div><p>↑ Energy increases power. ◆ Crates change weapons. Shields absorb a hit. Magnets pull in loot. Cooling and double score last 15 seconds.</p><button class="primary" id="back">GOT IT <span>↗</span></button>`,
+      `<p>Clear formations, collect energy cores, and bring down the boss in every tenth wave. Finish all eight systems to unlock Endless.</p><div class="controls"><div><b>MOVE</b><span>Mouse · WASD · Arrow keys<br>Touch: left joystick or drag the playfield</span></div><div><b>FIRE</b><span>Automatic by default<br>Space or hold to fire manually</span></div><div><b>NOVA BOMB</b><span>X · Right click · ✳ button<br>50 food earns an extra bomb</span></div><div><b>STAY COOL</b><span>Heat at 100% locks fire briefly<br>Shift for precision · Esc to pause</span></div></div><p>↑ Energy increases power. ◆ Crates change weapons. Shields absorb a hit. Magnets pull in loot. Cooling and double score last 15 seconds.</p><button class="primary" id="back">GOT IT <span>↗</span></button>`,
     );
     this.bind("back", () => this.menu());
   }

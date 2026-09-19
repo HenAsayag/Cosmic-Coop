@@ -2,6 +2,9 @@ import { save } from "./SaveManager.js";
 export class MobileInput {
   constructor(scene) {
     this.scene = scene;
+    this.joystickPointer = null;
+    this.joyX = 0;
+    this.joyY = 0;
     this.pointerId = null;
     this.down = false;
     this.hasTarget = false;
@@ -13,7 +16,7 @@ export class MobileInput {
     scene.input.addPointer(3);
     scene.input.mouse.disableContextMenu();
     scene.input.on("pointerdown", (p) => {
-      if (scene.mode !== "play") return;
+      if (scene.mode !== "play" || this.joystickPointer !== null) return;
       if (p.rightButtonDown()) {
         scene.nova();
         return;
@@ -47,7 +50,68 @@ export class MobileInput {
     );
     this.keys.X.on("down", () => scene.nova());
   }
+  mountJoystick(element) {
+    this.joystick = element;
+    this.knob = element.querySelector(".joystick-knob");
+    const stop = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    element.addEventListener("pointerdown", (event) => {
+      stop(event);
+      if (this.scene.mode !== "play" || this.joystickPointer !== null) return;
+      this.pointerId = null;
+      this.down = false;
+      this.hasTarget = false;
+      this.joystickPointer = event.pointerId;
+      this.joystickBounds = element.getBoundingClientRect();
+      element.setPointerCapture(event.pointerId);
+      element.classList.add("active");
+      this.moveJoystick(event);
+    });
+    element.addEventListener("pointermove", (event) => {
+      if (event.pointerId !== this.joystickPointer) return;
+      stop(event);
+      this.moveJoystick(event);
+    });
+    for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) {
+      element.addEventListener(type, (event) => {
+        if (event.pointerId !== this.joystickPointer) return;
+        stop(event);
+        this.releaseJoystick();
+      });
+    }
+  }
+  moveJoystick(event) {
+    const rect = this.joystickBounds,
+      radius = rect.width * 0.32;
+    let x = (event.clientX - rect.left - rect.width / 2) / radius;
+    let y = (event.clientY - rect.top - rect.height / 2) / radius;
+    const length = Math.hypot(x, y);
+    if (length > 1) {
+      x /= length;
+      y /= length;
+    }
+    const strength = Math.max(0, (Math.min(1, length) - 0.14) / 0.86);
+    this.joyX = length > 0.14 ? (x / Math.min(1, length)) * strength : 0;
+    this.joyY = length > 0.14 ? (y / Math.min(1, length)) * strength : 0;
+    this.knob.style.transform =
+      "translate(" + x * radius + "px," + y * radius + "px)";
+  }
+  releaseJoystick() {
+    const pointer = this.joystickPointer;
+    this.joystickPointer = null;
+    this.joyX = this.joyY = 0;
+    this.hasTarget = false;
+    if (this.joystick) {
+      this.joystick.classList.remove("active");
+      this.knob.style.transform = "translate(0px,0px)";
+      if (pointer !== null && this.joystick.hasPointerCapture(pointer))
+        this.joystick.releasePointerCapture(pointer);
+    }
+  }
   reset() {
+    this.releaseJoystick();
     this.pointerId = null;
     this.down = false;
     this.hasTarget = false;
@@ -75,6 +139,11 @@ export class MobileInput {
       const norm = dx && dy ? 0.707 : 1;
       g.px += dx * speed * norm * dt;
       g.py += dy * speed * norm * dt;
+      this.hasTarget = false;
+    } else if (this.joystickPointer !== null) {
+      const speed = k.SHIFT.isDown ? 370 : 950;
+      g.px += this.joyX * speed * dt;
+      g.py += this.joyY * speed * dt;
       this.hasTarget = false;
     } else if (this.hasTarget) {
       g.px += (this.x - g.px) * Math.min(1, dt * 22);

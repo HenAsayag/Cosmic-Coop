@@ -6,13 +6,13 @@ An original Phaser 3 / WebGL arcade shooter: eight star systems, 80 campaign wav
 
 ## Play on a phone
 
-1. Open the Pages link and choose **LET’S FLY**, then a star system.
-2. Allow full screen and hold the phone **horizontally (landscape)**. The game requests an orientation lock when supported.
+1. Open the Pages link. The menu waits behind the full-screen landscape setup screen.
+2. Hold the phone **horizontally (landscape)** and tap **ENTER FULL SCREEN**. Then choose **LET’S FLY** and a star system. The game requests an orientation lock when supported.
 3. If the browser cannot put web games in full screen, use **Add to Home Screen** (Safari: Share → Add to Home Screen), launch the installed icon, and rotate the phone. Enable phone auto-rotation if necessary.
 
-Mobile combat waits until the game is full screen / installed and landscape. Leaving full screen or turning to portrait pauses the run. Returning to landscape never silently resumes combat: tap **RESUME FLIGHT**.
+Both the mobile menu and combat wait until the game is full screen / installed and landscape. Leaving full screen or turning to portrait pauses the run. Returning to landscape never silently resumes combat: tap **RESUME FLIGHT**.
 
-Drag below the top quarter to move; auto-fire is enabled by default. The ship follows above the finger. Tap the Nova button with a second finger to clear danger. Desktop controls: mouse / WASD / arrows, Space or held click to fire, Shift for precision, X / right click for Nova, Escape to pause.
+Use the **left joystick** to move; release it to stop immediately. Auto-fire is enabled by default. Dragging the playfield is also supported, with the ship above the finger. Tap the Nova button with a second finger to clear danger. Desktop controls: mouse / WASD / arrows, Space or held click to fire, Shift for precision, X / right click for Nova, Escape to pause.
 
 ## Run locally
 
