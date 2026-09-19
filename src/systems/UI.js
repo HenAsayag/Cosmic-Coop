@@ -45,8 +45,13 @@ export class UI {
   }
   bind(id, fn) {
     bindActivation(document.getElementById(id), () => {
-      this.scene.audio.sfx("menu_click");
       fn();
+      // Cosmetic audio must never prevent navigation or a stage launch.
+      try {
+        this.scene.audio.sfx("menu_click");
+      } catch {
+        /* Continue silently if mobile audio is unavailable. */
+      }
     });
   }
   menu() {
@@ -80,6 +85,14 @@ export class UI {
     this.bind("back", () => this.menu());
   }
   start(wave, endless) {
+    const selected = document.getElementById(
+      `system-${Math.floor((wave - 1) / 10)}`,
+    );
+    if (selected) {
+      selected.disabled = true;
+      selected.textContent = "LAUNCHING…";
+      selected.setAttribute("aria-busy", "true");
+    }
     display.prepare(this.scene, () => {
       this.el.screen.innerHTML = "";
       this.el.hud.style.display = "block";

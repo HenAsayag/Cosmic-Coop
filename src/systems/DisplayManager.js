@@ -61,7 +61,11 @@ export class DisplayManager {
   }
   prepare(scene, ready) {
     this.scene = scene;
-    if (!this.mobile) {
+    if (!this.mobile || (this.fullscreen && this.landscape)) {
+      this.pending = null;
+      this.generation++;
+      // Refresh Phaser's input bounds after the initial fullscreen layout.
+      scene.scale.refresh();
       ready();
       return;
     }
