@@ -1,0 +1,7 @@
+node_modules/
+.npm-cache/
+test-results/
+playwright-report/
+Cosmic_Coop_WebGL_Mobile_Kit/
+tests/*.png
+tests/*.mjs
