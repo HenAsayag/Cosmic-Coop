@@ -1,3 +1,4 @@
+import { bindActivation } from "./ButtonInput.js";
 import { display } from "./DisplayManager.js";
 import { save } from "./SaveManager.js";
 import { SYSTEMS, WEAPONS } from "../data/content.js";
@@ -33,7 +34,9 @@ export class UI {
     ])
       this.el[id] = document.getElementById(id);
     this.scene.inputControl.mountJoystick(document.getElementById("joystick"));
-    document.getElementById("pause").onclick = () => this.scene.pauseGame();
+    bindActivation(document.getElementById("pause"), () =>
+      this.scene.pauseGame(),
+    );
     this.el.nova.onpointerdown = (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -41,7 +44,7 @@ export class UI {
     };
   }
   bind(id, fn) {
-    document.getElementById(id)?.addEventListener("click", () => {
+    bindActivation(document.getElementById(id), () => {
       this.scene.audio.sfx("menu_click");
       fn();
     });

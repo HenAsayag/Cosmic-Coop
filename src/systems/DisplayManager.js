@@ -1,3 +1,4 @@
+import { bindActivation } from "./ButtonInput.js";
 // Mobile menus and gameplay share the same fullscreen / landscape requirement.
 // Fullscreen requests always originate from a tap, never from a page-load event.
 export class DisplayManager {
@@ -16,7 +17,7 @@ export class DisplayManager {
     this.title = this.gate.querySelector("#display-title");
     this.message = this.gate.querySelector("#display-message");
     this.button = this.gate.querySelector("#enter-fullscreen");
-    this.button.onclick = () => this.enter();
+    bindActivation(this.button, () => this.enter());
     for (const event of ["resize", "orientationchange"])
       window.addEventListener(event, () => this.check());
     for (const event of ["fullscreenchange", "webkitfullscreenchange"])
@@ -67,10 +68,16 @@ export class DisplayManager {
     this.required = true;
     this.pending = ready;
     this.generation++;
-    this.enter();
+    // Actual display state is sufficient. Optional orientation-lock promises
+    // must never hold a stage selection or resume behind a browser response.
+    this.check();
+    if (!this.fullscreen || !this.landscape) this.enter();
   }
   async enter() {
-    if (this.busy) return;
+    if (this.busy) {
+      this.check();
+      return;
+    }
     this.busy = true;
     try {
       if (!this.fullscreen && this.supported) {
@@ -81,7 +88,9 @@ export class DisplayManager {
       }
       if (this.fullscreen && screen.orientation?.lock) {
         try {
-          await screen.orientation.lock("landscape");
+          Promise.resolve(screen.orientation.lock("landscape")).catch(() => {
+            /* Physical rotation remains available if the browser declines. */
+          });
         } catch {
           /* Physical rotation remains available. */
         }
